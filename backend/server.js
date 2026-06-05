@@ -70,6 +70,8 @@ app.post('/api/login', (req, res) => {
         // We can define the admin by username (e.g., 'admin') or a specific ID
         const isAdmin = user.username.toLowerCase() === 'admin';
 
+
+        //Here is role assigned!!!
         res.json({
             message: "Login successful!",
             user: {
@@ -91,6 +93,27 @@ db.getConnection((err, connection) => {
         connection.release(); // Return connection to pool
     }
 });
+
+// 3. List a New Item for Sale
+app.post('/api/items', (req, res) => {
+    const { title, description, price, image_url, user_id } = req.body;
+
+    // Validation
+    if (!title || !description || !price || !user_id) {
+        return res.status(400).json({ error: "Title, description, price, and user ID are required fields." });
+    }
+
+    const query = 'INSERT INTO items (title, description, price, image_url, user_id) VALUES (?, ?, ?, ?, ?)';
+    db.query(query, [title, description, price, image_url || null, user_id], (err, result) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error: "Database error while listing the item." });
+        }
+        res.status(201).json({ message: "Item listed successfully!", itemId: result.insertId });
+    });
+});
+
+
 
 // Basic Live-Check Route
 app.get('/api/health', (req, res) => {
