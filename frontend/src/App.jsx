@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'; // Fixed: Added useEffect import
 import { BrowserRouter as Router, Routes, Route, Navigate, Link, useNavigate } from 'react-router-dom';
+import ItemDetails from './components/ItemDetails.jsx';
 
 // --- NESTED NAVBAR COMPONENT ---
 function Navbar({ user, onLogout }) {
@@ -300,6 +301,7 @@ function App() {
           <Route path="/register" element={user ? <Navigate to="/" /> : <Register />} />
           <Route path="/sell" element={user?.role === 'standard' ? <SellItem user={user} /> : <Navigate to="/login" />} />
           <Route path="/calendar" element={<div>Calendar View Placeholder</div>} />
+          <Route path="/items/:id" element={<ItemDetails user={user} />} />
           <Route path="/admin" element={user?.role === 'admin' ? <div>Admin Panel Dashboard</div> : <Navigate to="/" />} />
         </Routes>
       </div>

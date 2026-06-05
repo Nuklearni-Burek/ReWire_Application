@@ -128,6 +128,62 @@ app.post('/api/items', (req, res) => {
     });
 });
 
+
+// 5. Fetch Individual Item Details with Comments
+// 5. Fetch Individual Item Details with Comments (Updated)
+app.get('/api/items/:id', (req, res) => {
+    const itemId = req.params.id;
+
+    const itemQuery = `
+        SELECT items.*, users.username FROM items 
+        JOIN users ON items.user_id = users.id 
+        WHERE items.id = ?`;
+
+    db.query(itemQuery, [itemId], (err, itemResults) => {
+        if (err) return res.status(500).json({ error: "Database error fetching item details." });
+        if (itemResults.length === 0) return res.status(404).json({ error: "Item not found." });
+
+        // Fixed: Selecting text_content AS text so our React component fields don't have to change
+        const commentsQuery = `
+            SELECT comments.id, comments.text_content AS text, comments.created_at, users.username 
+            FROM comments 
+            JOIN users ON comments.user_id = users.id 
+            WHERE comments.item_id = ? 
+            ORDER BY comments.created_at ASC`;
+
+        db.query(commentsQuery, [itemId], (err, commentResults) => {
+            if (err) return res.status(500).json({ error: "Database error fetching comments." });
+            
+            res.json({
+                item: itemResults[0],
+                comments: commentResults
+            });
+        });
+    });
+});
+
+// 6. Post a New Comment (Updated to match your exact column name)
+app.post('/api/items/:id/comments', (req, res) => {
+    const itemId = req.params.id;
+    const { text, user_id } = req.body; // 'text' is what comes from React state
+
+    if (!text || !user_id) {
+        return res.status(400).json({ error: "Comment text and user validation are required." });
+    }
+
+    // Fixed: Changed column name to 'text_content' to match your database schema
+    const query = 'INSERT INTO comments (text_content, item_id, user_id) VALUES (?, ?, ?)';
+    
+    db.query(query, [text, itemId, user_id], (err, result) => {
+        if (err) {
+            console.error("❌ SQL Error saving comment:", err);
+            return res.status(500).json({ error: "Database error saving comment." });
+        }
+        res.status(201).json({ message: "Comment added successfully!" });
+    });
+});
+
+
 app.listen(PORT, () => {
     console.log(`🚀 Session-secured Server running on port ${PORT}`);
 });
