@@ -70,6 +70,66 @@ export default function ItemDetails({ user }) {
           <div className="small text-secondary">
             Listed by: <strong className="text-dark">{item.username}</strong> on {new Date(item.created_at).toLocaleDateString()}
           </div>
+          {/* Buy Action Triggers Form Engine */}
+{user && user.id !== item.user_id ? (
+  <div className="mt-4 border p-3 rounded bg-light shadow-sm">
+    <h5 className="fw-bold mb-3">💳 Secure Checkout</h5>
+    
+    <form onSubmit={async (e) => {
+      e.preventDefault();
+      const fullName = e.target.fullName.value;
+      const creditCard = e.target.creditCard.value;
+      const shippingLocation = e.target.shippingLocation.value;
+
+      try {
+        const res = await fetch(`http://88.200.63.148:6361/api/items/${item.id}/buy`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ 
+            user_id: user.id, // Maps to user_id (the Buyer) in your schema
+            full_name: fullName,
+            credit_card: creditCard,
+            shipping_location: shippingLocation
+          })
+        });
+        
+        const resData = await res.json();
+        if (!res.ok) throw new Error(resData.error || 'Transaction failed');
+        
+        alert('Transaction completed! Device successfully purchased.');
+        navigate('/'); 
+      } catch (err) {
+        alert(err.message);
+      }
+    }}>
+      <div className="mb-2">
+        <label className="form-label small fw-semibold mb-1">Full Name</label>
+        <input type="text" name="fullName" className="form-control form-control-sm" placeholder="John Doe" required />
+      </div>
+      <div className="mb-2">
+        <label className="form-label small fw-semibold mb-1">Credit Card Number</label>
+        <input type="text" name="creditCard" className="form-control form-control-sm" placeholder="1234 5678 9101 1121" required />
+      </div>
+      <div className="mb-3">
+        <label className="form-label small fw-semibold mb-1">Shipping Address</label>
+        <input type="text" name="shippingLocation" className="form-control form-control-sm" placeholder="e.g., Presernov trg 1, Koper" required />
+      </div>
+      
+      <button type="submit" className="btn btn-success btn-sm w-100 fw-bold">
+        Confirm & Purchase (€{parseFloat(item.price).toFixed(2)})
+      </button>
+    </form>
+  </div>
+) : user && user.id === item.user_id ? (
+  <div className="alert alert-info small text-center mt-4 mb-0">
+    You listed this device for sale.
+  </div>
+) : (
+  <div className="alert alert-warning small text-center mt-4 mb-0">
+    Please <Link to="/login">Log In</Link> to buy this device.
+  </div>
+)}
           <button className="btn btn-outline-secondary btn-sm mt-4" onClick={() => navigate('/')}>← Back to Marketplace</button>
         </div>
       </div>

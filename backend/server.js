@@ -184,6 +184,41 @@ app.post('/api/items/:id/comments', (req, res) => {
 });
 
 
+// 7. Purchase an Item (Matches exact schema columns)
+app.post('/api/items/:id/buy', (req, res) => {
+    const itemId = req.params.id;
+    const { user_id, full_name, credit_card, shipping_location } = req.body;
+
+    // Validate all required fields based on your schema profile
+    if (!user_id || !full_name || !credit_card || !shipping_location) {
+        return res.status(400).json({ error: "All checkout details are required." });
+    }
+
+    // Step A: Double check if the item hasn't already been sold
+    const checkQuery = 'SELECT * FROM purchases WHERE item_id = ?';
+    db.query(checkQuery, [itemId], (err, currentTransactions) => {
+        if (err) return res.status(500).json({ error: "Database verification failed." });
+        if (currentTransactions.length > 0) {
+            return res.status(400).json({ error: "This unique device has already been purchased!" });
+        }
+
+        // Step B: Proceed with recording the purchase mapping matching your exact schema layout
+        const insertQuery = `
+            INSERT INTO purchases (item_id, user_id, full_name, credit_card, shipping_location) 
+            VALUES (?, ?, ?, ?, ?)
+        `;
+        
+        db.query(insertQuery, [itemId, user_id, full_name, credit_card, shipping_location], (err, result) => {
+            if (err) {
+                console.error("❌ SQL Purchase Error:", err);
+                return res.status(500).json({ error: "Database error processing transaction entry." });
+            }
+            res.status(201).json({ message: "Purchase completed successfully!" });
+        });
+    });
+});
+
+
 app.listen(PORT, () => {
     console.log(`🚀 Session-secured Server running on port ${PORT}`);
 });
