@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Link, useNavigate } from 'react-router-dom';
 import ItemDetails from './components/ItemDetails.jsx';
+import Calendar from './components/Calendar.jsx';
 
 // --- NESTED NAVBAR COMPONENT ---
-function Navbar({ user, onLogout, cartCount }) {
+function Navbar({ user, onLogout, cartCount, theme, onToggleTheme }) {
   const navigate = useNavigate();
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark mb-4 shadow-sm">
@@ -35,6 +36,17 @@ function Navbar({ user, onLogout, cartCount }) {
               <li className="nav-item"><Link className="nav-link text-warning fw-bold" to="/admin">Admin Dashboard</Link></li>
             )}
           </ul>
+          <button 
+
+          // Theme toggle button with dynamic styling based on current theme state
+  onClick={onToggleTheme} 
+  className={`btn btn-sm me-3 ${theme === 'dark' ? 'btn-outline-warning' : 'btn-outline-secondary'}`}
+  type="button"
+>
+  {theme === 'dark' ? '☀️ Bright Mode' : '🌙 Dark Mode'}
+</button>
+
+
           <div className="d-flex align-items-center">
             {user ? (
               <>
@@ -351,6 +363,7 @@ function App() {
   const [user, setUser] = useState(null);
   const [cart, setCart] = useState([]); // Master Cart State Array
   const [loading, setLoading] = useState(true);
+  const [theme, setTheme] = useState('light'); // Initial baseline state
 
   useEffect(() => {
     fetch('http://88.200.63.148:6361/api/me', { credentials: 'include' })
@@ -363,6 +376,11 @@ function App() {
       })
       .catch(() => setLoading(false));
   }, []);
+ //za toggle dark/bright mode
+  useEffect(() => {
+    document.documentElement.setAttribute('data-bs-theme', theme);
+  }, [theme]);
+
 
   const handleAddToCart = (item) => {
     // Check if item is already in cart to prevent duplicates
@@ -378,6 +396,10 @@ function App() {
     setCart(cart.filter(item => item.id !== itemId));
   };
 
+  const toggleTheme = () => {
+  setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'bright');
+};
+
   const handleClearCart = () => setCart([]);
   const handleLogout = async () => {
     try {
@@ -391,8 +413,7 @@ function App() {
 
   return (
     <Router>
-      <Navbar user={user} onLogout={handleLogout} cartCount={cart.length} />
-      <div className="container">
+     <Navbar user={user} onLogout={handleLogout} cartCount={cart.length} theme={theme} onToggleTheme={toggleTheme} />      <div className="container">
         <Routes>
           <Route path="/" element={<Marketplace />} />
           <Route path="/cart" element={user?.role === 'standard' ? <CartView user={user} cart={cart} onRemoveItem={handleRemoveFromCart} onClearCart={handleClearCart} /> : <Navigate to="/login" />} />
@@ -400,7 +421,7 @@ function App() {
           <Route path="/login" element={user ? <Navigate to="/" /> : <Login onLoginSuccess={setUser} />} />
           <Route path="/register" element={user ? <Navigate to="/" /> : <Register />} />
           <Route path="/sell" element={user?.role === 'standard' ? <SellItem user={user} /> : <Navigate to="/login" />} />
-          <Route path="/calendar" element={<div>Calendar View Placeholder</div>} />
+          <Route path="/calendar" element={<Calendar />} />
           <Route path="/admin" element={user?.role === 'admin' ? <div>Admin Panel Dashboard</div> : <Navigate to="/" />} />
         </Routes>
       </div>
