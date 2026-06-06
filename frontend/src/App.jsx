@@ -51,7 +51,7 @@ function App() {
   };
 
   const toggleTheme = () => {
-  setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'bright');
+  setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
 };
 
   const handleClearCart = () => setCart([]);
