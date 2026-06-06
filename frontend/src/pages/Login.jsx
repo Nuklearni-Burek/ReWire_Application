@@ -13,9 +13,10 @@ function Login({ onLoginSuccess }) {
 
     try {
       const response = await fetch('http://88.200.63.148:6361/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include', // ✅ add this
+      body: JSON.stringify({ username, password })
       });
 
       const data = await response.json();
