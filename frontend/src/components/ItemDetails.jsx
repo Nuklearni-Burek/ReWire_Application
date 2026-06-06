@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 
-export default function ItemDetails({ user }) {
+export default function ItemDetails({ user, onAddToCart, cart }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const [data, setData] = useState(null);

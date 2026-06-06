@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Link, useNavigate } from 'react-router-dom';
 import ItemDetails from './components/ItemDetails.jsx';
 import Calendar from './components/Calendar.jsx';
+import AdminDashboard from './components/AdminDashboard.jsx';
 
 // --- NESTED NAVBAR COMPONENT ---
 function Navbar({ user, onLogout, cartCount, theme, onToggleTheme }) {
@@ -12,30 +13,31 @@ function Navbar({ user, onLogout, cartCount, theme, onToggleTheme }) {
         <Link className="navbar-brand fw-bold text-primary" to="/">ReWire</Link>
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav me-auto">
-            <li className="nav-item"><Link className="nav-link" to="/">Marketplace</Link></li>
-            
-            {/* Added Cart Navigation Tab exactly between Marketplace and Holidays */}
-            {user && user.role === 'standard' && (
-              <li className="nav-item">
-                <Link className="nav-link position-relative text-info fw-semibold" to="/cart">
-                  Cart 🛒 
-                  {cartCount > 0 && (
-                    <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                      {cartCount}
-                    </span>
-                  )}
-                </Link>
-              </li>
+  {/* Wrap standard navigation tabs so they disappear entirely for an admin */}
+  {(!user || user.role !== 'admin') && (
+    <>
+      <li className="nav-item"><Link className="nav-link" to="/">Marketplace</Link></li>
+      
+      {user && user.role === 'standard' && (
+        <li className="nav-item">
+          <Link className="nav-link position-relative text-info fw-semibold" to="/cart">
+            Cart 🛒 
+            {cartCount > 0 && (
+              <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                {cartCount}
+              </span>
             )}
+          </Link>
+        </li>
+      )}
 
-            <li className="nav-item"><Link className="nav-link" to="/calendar">Holidays</Link></li>
-            {user && user.role === 'standard' && (
-              <li className="nav-item"><Link className="btn btn-outline-success btn-sm mt-1 ms-2" to="/sell">Sell an item</Link></li>
-            )}
-            {user && user.role === 'admin' && (
-              <li className="nav-item"><Link className="nav-link text-warning fw-bold" to="/admin">Admin Dashboard</Link></li>
-            )}
-          </ul>
+      <li className="nav-item"><Link className="nav-link" to="/calendar">Holidays</Link></li>
+      {user && user.role === 'standard' && (
+        <li className="nav-item"><Link className="btn btn-outline-success btn-sm mt-1 ms-2" to="/sell">Sell an item</Link></li>
+      )}
+    </>
+  )}
+</ul>
           <button 
 
           // Theme toggle button with dynamic styling based on current theme state
@@ -358,6 +360,10 @@ function SellItem({ user }) {
   );
 }
 
+
+
+
+
 // --- MAIN CONTROL ENVIRONMENT WITH INTEGRATED CART STATE MAPPING ---
 function App() {
   const [user, setUser] = useState(null);
@@ -415,15 +421,17 @@ function App() {
     <Router>
      <Navbar user={user} onLogout={handleLogout} cartCount={cart.length} theme={theme} onToggleTheme={toggleTheme} />      <div className="container">
         <Routes>
-          <Route path="/" element={<Marketplace />} />
-          <Route path="/cart" element={user?.role === 'standard' ? <CartView user={user} cart={cart} onRemoveItem={handleRemoveFromCart} onClearCart={handleClearCart} /> : <Navigate to="/login" />} />
-          <Route path="/items/:id" element={<ItemDetails user={user} onAddToCart={handleAddToCart} cart={cart} />} />
-          <Route path="/login" element={user ? <Navigate to="/" /> : <Login onLoginSuccess={setUser} />} />
-          <Route path="/register" element={user ? <Navigate to="/" /> : <Register />} />
-          <Route path="/sell" element={user?.role === 'standard' ? <SellItem user={user} /> : <Navigate to="/login" />} />
-          <Route path="/calendar" element={<Calendar />} />
-          <Route path="/admin" element={user?.role === 'admin' ? <div>Admin Panel Dashboard</div> : <Navigate to="/" />} />
-        </Routes>
+  <Route path="/" element={user?.role === 'admin' ? <AdminDashboard /> : <Marketplace />} />
+  <Route path="/cart" element={user?.role === 'standard' ? <CartView user={user} cart={cart} onRemoveItem={handleRemoveFromCart} onClearCart={handleClearCart} /> : <Navigate to="/login" />} />
+  
+  {/* Protect Item Details and Calendar from Admin role exploration */}
+  <Route path="/items/:id" element={user?.role === 'admin' ? <Navigate to="/" /> : <ItemDetails user={user} onAddToCart={handleAddToCart} cart={cart} />} />
+  <Route path="/calendar" element={user?.role === 'admin' ? <Navigate to="/" /> : <Calendar />} />
+  
+  <Route path="/login" element={user ? <Navigate to="/" /> : <Login onLoginSuccess={setUser} />} />
+  <Route path="/register" element={user ? <Navigate to="/" /> : <Register />} />
+  <Route path="/sell" element={user?.role === 'standard' ? <SellItem user={user} /> : <Navigate to="/login" />} />
+</Routes>
       </div>
     </Router>
   );

@@ -130,7 +130,6 @@ app.post('/api/items', (req, res) => {
 
 
 // 5. Fetch Individual Item Details with Comments
-// 5. Fetch Individual Item Details with Comments (Updated)
 app.get('/api/items/:id', (req, res) => {
     const itemId = req.params.id;
 
@@ -214,6 +213,46 @@ app.post('/api/items/:id/buy', (req, res) => {
                 return res.status(500).json({ error: "Database error processing transaction entry." });
             }
             res.status(201).json({ message: "Purchase completed successfully!" });
+        });
+    });
+});
+
+// 8. Admin Dashboard Metrics Data Layer (Updated for Session Security)
+app.get('/api/admin/metrics', (req, res) => {
+    // 1. Check if user session exists and if the role is explicitly 'admin'
+    if (!req.session || !req.session.user || req.session.user.role !== 'admin') {
+        return res.status(403).json({ error: 'Access denied. Administrator privileges required.' });
+    }
+    
+    // Count all registered users on the system except the admin account itself
+    const usersCountQuery = 'SELECT COUNT(*) AS total_users FROM users WHERE LOWER(username) != "admin"';
+    
+    // Count all items ever listed on the platform
+    const itemsCountQuery = 'SELECT COUNT(*) AS total_items FROM items';
+    
+    // Fetch transaction history by joining purchases directly to items (Using your exact column names)
+    const transactionsQuery = `
+        SELECT p.id, p.full_name, p.shipping_location, p.purchased_at, i.title, i.price 
+        FROM purchases p
+        JOIN items i ON p.item_id = i.id
+        ORDER BY p.purchased_at DESC
+    `;
+
+    db.query(usersCountQuery, (err, uResult) => {
+        if (err) return res.status(500).json({ error: 'Failed to fetch user metrics.' });
+
+        db.query(itemsCountQuery, (err, iResult) => {
+            if (err) return res.status(500).json({ error: 'Failed to fetch item metrics.' });
+
+            db.query(transactionsQuery, (err, tResult) => {
+                if (err) return res.status(500).json({ error: 'Failed to fetch transaction records.' });
+
+                res.json({
+                    totalUsers: uResult[0].total_users,
+                    totalItems: iResult[0].total_items,
+                    transactions: tResult
+                });
+            });
         });
     });
 });
