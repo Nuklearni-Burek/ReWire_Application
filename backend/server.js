@@ -2,6 +2,22 @@ const express = require('express');
 const cors = require('cors');
 const mysql = require('mysql2');
 const session = require('express-session');
+const multer = require('multer');
+const path = require('path');
+
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/'); // saves to a folder called uploads
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname)); // e.g. 1234567890.jpg
+  }
+});
+
+const upload = multer({ storage });
+
+
 require('dotenv').config();
 
 const app = express();
@@ -13,6 +29,7 @@ app.use(cors({
     credentials: true // Allows cookies to travel back and forth
 }));
 app.use(express.json());
+app.use('/uploads', express.static('uploads'));
 
 // Configure Express Session Middleware
 app.use(session({
@@ -256,6 +273,14 @@ app.get('/api/admin/metrics', (req, res) => {
         });
     });
 });
+
+
+app.post('/api/upload', upload.single('image'), (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'No file uploaded.' });
+  const imageUrl = `http://88.200.63.148:6361/uploads/${req.file.filename}`;
+  res.json({ image_url: imageUrl });
+});
+
 
 
 app.listen(PORT, () => {
