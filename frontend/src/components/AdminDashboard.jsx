@@ -58,40 +58,6 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* DETAILED TRANSACTION AUDIT TABLE */}
-      <div className="card shadow-sm p-4">
-        <h4 className="fw-bold mb-3 text-body">Platform Purchase Log Ledger</h4>
-        {metrics.transactions.length === 0 ? (
-          <p className="text-muted italic my-3 text-center">No transactions completed across the marketplace network yet.</p>
-        ) : (
-          <div className="table-responsive">
-            <table className="table table-hover align-middle custom-admin-table">
-              <thead className="table-secondary">
-                <tr>
-                  <th>ID</th>
-                  <th>Device / Item</th>
-                  <th>Amount</th>
-                  <th>Buyer Name</th>
-                  <th>Shipping Destination</th>
-                  <th>Timestamp</th>
-                </tr>
-              </thead>
-              <tbody>
-                {metrics.transactions.map((t) => (
-                  <tr key={t.id}>
-                    <td><code className="text-secondary">#{t.id}</code></td>
-                    <td><strong>{t.title}</strong></td>
-                    <td className="text-success fw-bold">€{parseFloat(t.price).toFixed(2)}</td>
-                    <td>{t.full_name}</td>
-                    <td className="text-truncate small" style={{ maxWidth: '200px' }}>{t.shipping_location}</td>
-                    <td className="small text-muted">{new Date(t.purchased_at).toLocaleString()}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
     </div>
   );
 }

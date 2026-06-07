@@ -60,7 +60,7 @@ function Calendar() {
           ) : (
             <div className="alert alert-success border-start border-success border-4 mb-4">
               <h6 className="fw-bold">🚚 Logistics Operational</h6>
-              <p className="mb-0 small">Today is a working day. Deliveries are on schedule.</p>
+              <p className="mb-0 small">Today is a working day. </p>
             </div>
           )
         )}
