@@ -1,43 +1,41 @@
 # ReWire – Electronic Device Marketplace
 
-ReWire is a web-based marketplace designed specifically for buying and selling second-hand electronic devices. The application allows users to register, sell and purchase devices, comment on listings, sort the marketplace, and customize the interface. It also provides a separate administrative dashboard with marketplace analytics.
+ReWire is a web-based marketplace focused on buying and selling second-hand electronic devices. Users can create accounts, list devices, interact with listings, and purchase products. The application also includes a separate administrative dashboard for marketplace analytics.
 
-The project was developed as part of the Systems III course.
+## ✨ Features
 
-## 🎥 Project Demo
+* 🔐 **User Authentication** – Registration, login, logout, and session-based authentication.
+* 🛍️ **Marketplace** – Users can list electronic devices with a name, description, price, and product image.
+* 🖼️ **Image Uploads** – Product images can be uploaded directly using Multer.
+* 💬 **Comments** – Users can view and leave comments on individual listings.
+* 🛒 **Shopping Cart & Checkout** – Users can add items to their cart and complete purchases.
+* 🔎 **Catalog Sorting** – Sort listings by newest, oldest, cheapest, or most expensive.
+* 🌙 **Light/Dark Mode** – Switch between light and dark interface themes.
+* 📅 **Holiday Calendar** – Slovenian national holidays are displayed using live data from the Nager.Date API.
+* 📊 **Admin Dashboard** – Administrators can view user, item, and transaction statistics.
 
-A video demonstrating the application's functionalities is available here:
+## 🛠️ Technologies
 
-[![ReWire Demo](https://img.youtube.com/vi/-nhQcHyOWp4/0.jpg)](https://youtu.be/-nhQcHyOWp4)
+* **React** – Frontend and user interface
+* **Node.js** – Backend runtime
+* **Express.js** – REST API and server-side logic
+* **MySQL** – Relational database
+* **Multer** – Product image uploads
+* **React Calendar** – Interactive calendar
+* **Nager.Date API** – Slovenian holiday data
 
-## 🎨 Figma
+The application follows a client-server architecture, with the React frontend communicating with the Node.js/Express backend, which manages the MySQL database and external API requests.
 
-### Wireframe
-[View the ReWire wireframe on Figma](https://www.figma.com/design/j7mLcg8sfWddDo2jSdw6zE/Untitled?node-id=0-1&t=LupDUeMoxLpuPsiU-1)
+## 🎥 Demo
 
-### Entity-Relationship Diagram
-[View the ER diagram on Figma](https://www.figma.com/board/KxntjPTfvFcDhhceSeRoRr/ER-diagram--ReWire?node-id=0-1&t=PreC7pv87mRIeaFV-1)
+[Watch the functionality demonstration on YouTube](https://youtu.be/-nhQcHyOWp4)
 
-### Relational Model
-[View the relational model on Figma](https://www.figma.com/board/OtETsmRBoXySPW1tvDl4EI/Relational-model--ReWire?node-id=0-1&t=3WzRrftXZXMk5VS7-1)
+## 🎨 Design & Database
 
----
+* [Application Wireframe – Figma](https://www.figma.com/design/j7mLcg8sfWddDo2jSdw6zE/Untitled?node-id=0-1&t=LupDUeMoxLpuPsiU-1)
+* [Entity-Relationship Diagram – Figma](https://www.figma.com/board/KxntjPTfvFcDhhceSeRoRr/ER-diagram--ReWire?node-id=0-1&t=PreC7pv87mRIeaFV-1)
+* [Relational Model – Figma](https://www.figma.com/board/OtETsmRBoXySPW1tvDl4EI/Relational-model--ReWire?node-id=0-1&t=3WzRrftXZXMk5VS7-1)
 
-## ✨ Functionalities
+## 🎯 Goal
 
-### 1. User Registration and Authentication
-
-Users can create an account by providing a username and password confirmation. Registered users can securely log in and log out.
-
-The system supports two user types:
-
-- **Standard users** – can browse, sell, comment on, and purchase items.
-- **Administrator** – has a separate administrative workflow and cannot perform standard marketplace activities.
-
-**Challenge:**  
-One of the most challenging parts was implementing sessions. After logging in, a session is created and the session cookie must be included with subsequent requests so that the server can identify the user.
-
-```javascript
-fetch(url, {
-    credentials: "include"
-});
+ReWire provides a dedicated platform for reselling second-hand electronics, making it easier to reuse functional devices and helping reduce electronic waste.
